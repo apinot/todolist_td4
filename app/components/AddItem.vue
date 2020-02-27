@@ -10,9 +10,6 @@
 
 <script>
 export default {
-    props: [
-        "id",
-    ],
     data: function() {
         return {
             name: ''
@@ -21,7 +18,7 @@ export default {
     methods: {
         onSaveTap: function() {
             const newItem = {
-                id: this.id,
+                id: -1,
                 name: this.name,
                 done: false,
                 deleted: false
