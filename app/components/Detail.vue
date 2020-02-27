@@ -47,7 +47,7 @@ export default {
             });
         },
         remove: function() {
-            this.groceryItem.deleted = true;
+            this.$store.dispatch('delete', this.groceryItem)
             this.$navigateBack();
         },
         onDeleteTap: function(args) {

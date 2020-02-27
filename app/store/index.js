@@ -28,6 +28,10 @@ const store = new Vuex.Store({
         update(state, data) {
             const index = state.todoItems.findIndex((item) => item.id === data.todoItem.id);
             state.todoItems.splice(index, 1, data.todoItem);
+        },
+        delete(state, data) {
+            const index = state.todoItems.findIndex((item) => item.id === data.todoItem.id);
+            state.todoItems.splice(index, 1);
         }
     },
     actions: {
@@ -84,6 +88,15 @@ const store = new Vuex.Store({
             })
             .catch(() => {
                 console.log('CANNOT INSERT TODO ITEM IN DB', error);
+            })
+        },
+        delete(context, item) {
+            const db = context.state.database;
+            if(item.id < 0 || !item.done) return;
+            db.execSQL("DELETE FROM todoitems WHERE id = ?", [item.id])
+            .then((id) => {
+                if(!id) return;
+                context.commit('delete', {todoItem: item});
             })
         }
     },
