@@ -39,8 +39,7 @@ import AddItem from './AddItem';
         },
         computed: {
             showItems: function() {
-                if(! this.items) return []; 
-                return this.items.filter(item => !item.deleted);
+                return this.$store.getters.todoItems.filter(item => !item.deleted);
             }
         }
     };
