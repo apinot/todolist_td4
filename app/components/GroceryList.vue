@@ -1,0 +1,34 @@
+<template>
+    <ListView for="item in notDeleted" @itemTap="onItemTap">
+        <v-template>
+            <GroceryItem :groceryItem="item"></GroceryItem>
+        </v-template>
+    </ListView>
+</template>
+
+<script>
+import GroceryItem from './GroceryItem';
+import Detail from './Detail';
+
+    export default {
+        components: {
+            GroceryItem,
+            Detail
+        },
+        props: ['items'],
+        methods: {
+            onItemTap: function(args) {
+                this.$navigateTo(Detail, {
+                   props: {
+                       groceryItem: args.item
+                   }
+                });
+            }
+        },
+        computed: {
+            notDeleted: function() {
+                return this.items.filter(item => !item.deleted);
+            }
+        }
+    };
+</script>
