@@ -5,7 +5,7 @@
         </ActionBar>
         <StackLayout>
             <Button text="Go back" @tap="onBackTap"></Button>
-            <Label :text="groceryItem.name"></Label>
+            <Label :text="itemName"></Label>
             <Button :text="statusText" @tap="toggle"></Button> 
             <Button v-if="groceryItem.done" text="Delete" @tap="onDeleteTap"></Button> 
         </StackLayout>
@@ -30,6 +30,9 @@ export default {
     computed: {
         statusText: function() {
             return this.groceryItem.done ? 'Set as not Done' : 'Set as Done';
+        },
+        itemName() {
+            return this.groceryItem.name;
         }
     },
     methods: {
@@ -37,7 +40,11 @@ export default {
             this.$navigateBack();
         },
         toggle: function() {
-            this.groceryItem.done = !this.groceryItem.done;
+            this.update({
+                id: this.groceryItem.id,
+                name: this.groceryItem.name,
+                done: !this.groceryItem.done,
+            });
         },
         remove: function() {
             this.groceryItem.deleted = true;
@@ -51,9 +58,17 @@ export default {
             });
         },
         onEditTap: function() {
-            this.$showModal(EditItem, {props: {name: this.groceryItem.name}}).then((itemName) => {
-                this.groceryItem.name = itemName;
+            this.$showModal(EditItem, {props: {name: this.groceryItem.name}}).then((newName) => {
+                this.update({
+                    id: this.groceryItem.id,
+                    name: newName,
+                    done: this.groceryItem.done,
+                });
             });
+        },
+        update(newItem) {
+            this.$store.dispatch('update', newItem);
+            this.groceryItem = newItem;
         }
     }
 }

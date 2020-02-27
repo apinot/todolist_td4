@@ -24,6 +24,10 @@ const store = new Vuex.Store({
         },
         insert(state, data) {
             state.todoItems.unshift(data.todoItem);
+        },
+        update(state, data) {
+            const index = state.todoItems.findIndex((item) => item.id === data.todoItem.id);
+            state.todoItems.splice(index, 1, data.todoItem);
         }
     },
     actions: {
@@ -36,7 +40,7 @@ const store = new Vuex.Store({
 
                     //get data
                     if(!db) return;
-                    db.all('SELECT * FROM todoitems', [])
+                    db.all('SELECT * FROM todoitems ORDER BY id DESC', [])
                     .then((result) => {
                        const mapedItems = result.map((item) => {
                            return {id: item[0], name: item[1], done: item[2] === 'true'}
@@ -66,6 +70,17 @@ const store = new Vuex.Store({
                 }
 
                 context.commit('insert', {todoItem: newItem});
+            })
+            .catch(() => {
+                console.log('CANNOT INSERT TODO ITEM IN DB', error);
+            });
+        },
+        update(context, item) {
+            const db = context.state.database;
+            if(item.id < 0) return;
+            db.execSQL("UPDATE todoitems SET name = ?, done = ? WHERE id = ? ", [item.name, item.done.toString(), item.id])
+            .then((id) => {
+                context.commit('update', {todoItem: item});
             })
             .catch(() => {
                 console.log('CANNOT INSERT TODO ITEM IN DB', error);
