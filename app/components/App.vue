@@ -25,19 +25,16 @@ import AddItem from './AddItem';
         },
         methods: {
             onAddTap: function() {
-                const newId = new Date().getTime();
-                this.$showModal(AddItem, {props: {
-                    id: newId,
-                }}).then((newItem) => {
+                this.$showModal(AddItem).then((newItem) => {
                     if(newItem) {
-                        this.items.unshift(newItem);  
+                        this.$store.dispatch('insert', newItem);
                     }
                 });
             }
         },
         computed: {
             items: function() {
-                return this.$store.getters.todoItems.filter(item => !item.deleted);
+                return this.$store.getters.todoItems;
             }
         }
     };
