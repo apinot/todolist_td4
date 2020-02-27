@@ -1,19 +1,27 @@
 <template>
-    <ListView for="item in notDeleted" @itemTap="onItemTap">
-        <v-template>
-            <GroceryItem :groceryItem="item"></GroceryItem>
-        </v-template>
-    </ListView>
+    <TabView :selectedIndex="selectedIndex">
+        <TabViewItem title="All">
+            <GroceryListTab :items="all"></GroceryListTab>
+        </TabViewItem>
+        <TabViewItem title="Not done">
+            <StackLayout>
+                <GroceryListTab :items="notDoneItems"></GroceryListTab>
+            </StackLayout>
+        </TabViewItem>
+        <TabViewItem title="Done">
+            <StackLayout>
+                <GroceryListTab :items="doneItems"></GroceryListTab>
+            </StackLayout>
+        </TabViewItem>
+    </TabView>
 </template>
 
 <script>
-import GroceryItem from './GroceryItem';
-import Detail from './Detail';
+import GroceryListTab from './GroceryListTab';
 
     export default {
         components: {
-            GroceryItem,
-            Detail
+            GroceryListTab,
         },
         props: ['items'],
         methods: {
@@ -26,8 +34,17 @@ import Detail from './Detail';
             }
         },
         computed: {
-            notDeleted: function() {
-                return this.items.filter(item => !item.deleted);
+            all() {
+                if(! this.items) return []; 
+                return this.items;
+            },
+            notDoneItems(){
+                if(! this.items) return []; 
+                return this.items.filter(item => !item.done);
+            },
+            doneItems(){
+                if(! this.items) return []; 
+                return this.items.filter(item => item.done);
             }
         }
     };

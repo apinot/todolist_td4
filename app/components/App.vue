@@ -4,21 +4,7 @@
             <ActionItem text="Add" @tap="onAddTap"></ActionItem>   
         </ActionBar>
         <StackLayout>
-            <TabView :selectedIndex="selectedIndex">
-                <TabViewItem title="All">
-                    <GroceryList :items="all"></GroceryList>
-                </TabViewItem>
-                <TabViewItem title="Not done">
-                    <StackLayout>
-                        <GroceryList :items="notDoneItems"></GroceryList>
-                    </StackLayout>
-                </TabViewItem>
-                <TabViewItem title="Done">
-                    <StackLayout>
-                        <GroceryList :items="doneItems"></GroceryList>
-                    </StackLayout>
-                </TabViewItem>
-            </TabView>
+            <GroceryList :items="showItems"></GroceryList>
         </StackLayout>
     </Page>
 </template>
@@ -52,14 +38,9 @@ import AddItem from './AddItem';
             }
         },
         computed: {
-            all: function() {
-                return this.items;
-            },
-            notDoneItems: function() {
-                return this.items.filter(item => !item.done);
-            },
-            doneItems: function() {
-                return this.items.filter(item => item.done);
+            showItems: function() {
+                if(! this.items) return []; 
+                return this.items.filter(item => !item.deleted);
             }
         }
     };
