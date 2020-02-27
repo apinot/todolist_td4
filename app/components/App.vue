@@ -4,13 +4,12 @@
             <ActionItem text="Add" @tap="onAddTap"></ActionItem>   
         </ActionBar>
         <StackLayout>
-            <GroceryList :items="showItems"></GroceryList>
+            <GroceryList :items="items"></GroceryList>
         </StackLayout>
     </Page>
 </template>
 
 <script>
-import groceryData from '../grocery-data.json';
 import GroceryList from './GroceryList';
 import AddItem from './AddItem';
 
@@ -22,7 +21,6 @@ import AddItem from './AddItem';
         data() {
             return {
                 selectedIndex: 0,
-                items: groceryData.groceryItems.sort((a, b) => b.id - a.id),
             };
         },
         methods: {
@@ -38,7 +36,7 @@ import AddItem from './AddItem';
             }
         },
         computed: {
-            showItems: function() {
+            items: function() {
                 return this.$store.getters.todoItems.filter(item => !item.deleted);
             }
         }

@@ -3,9 +3,11 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
+import groceryData from '../grocery-data.json';
+
 const store = new Vuex.Store({
     state: {
-        todoItems: [],
+        todoItems: groceryData.groceryItems.sort((a, b) => b.id - a.id),
     },
     getters: {
         todoItems(state) {
