@@ -4,13 +4,11 @@ import Vuex from 'vuex';
 Vue.use(Vuex);
 
 import SQLite from 'nativescript-sqlite';
-import { clipPathProperty } from 'tns-core-modules/ui/frame/frame';
 
 const store = new Vuex.Store({
     state: {
         database: null,
         todoItems: [],
-        // todoItems: groceryData.groceryItems.sort((a, b) => b.id - a.id),
     },
     getters: {
         todoItems(state) {
