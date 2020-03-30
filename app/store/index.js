@@ -9,10 +9,22 @@ const store = new Vuex.Store({
     state: {
         database: null,
         todoItems: [],
+        auth: null,
     },
     getters: {
         todoItems(state) {
             return state.todoItems;
+        },
+        isAuth(state) {
+            return !!state.auth;
+        },
+        authToken(state) {
+            if(!state.auth) return null;
+            return state.auth.token;
+        },
+        authId(state) {
+            if(!state.auth) return null;
+            return state.auth.uuid;
         }
     },
     mutations: {
@@ -30,6 +42,9 @@ const store = new Vuex.Store({
         delete(state, data) {
             const index = state.todoItems.findIndex((item) => item.id === data.todoItem.id);
             state.todoItems.splice(index, 1);
+        },
+        auth(state, data) {
+            state.auth = data;
         }
     },
     actions: {
@@ -96,6 +111,9 @@ const store = new Vuex.Store({
                 if(!id) return;
                 context.commit('delete', {todoItem: item});
             })
+        },
+        auth(context, auth) {
+            context.commit('auth', auth);
         }
     },
 });

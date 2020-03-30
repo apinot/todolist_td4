@@ -4,6 +4,8 @@
             <ActionItem text="Login" @tap="goLogin"></ActionItem>   
         </ActionBar>
         <StackLayout>
+            <!-- TODO -->
+            <Progress width="100%" indeterminate="true"/>
             <Label marginTop="30" text="Sign Up" color="black" fontSize="25"  horizontalAlignment="center"></Label>
             <TextField v-model="email" hint="Email"/>
             <TextField v-model="firstName" hint="First Name"/>
@@ -29,6 +31,7 @@ export default {
             firstName: '',
             lastName: '',
             selectedIndex: 0,
+            isLoading: true,
         };
     },
     computed: {
@@ -38,6 +41,8 @@ export default {
     },
     methods: {
         onSignup() {
+            if(isLoading) return;
+            this.isLoading = true;
             const user = {
                 email: this.email,
                 firstname: this.firstName,
@@ -56,6 +61,9 @@ export default {
                     console.log(error);
                     console.log(user);
                 }); 
+            })
+            .finally(() => {
+                this.isLoading = false
             });
             
         },
