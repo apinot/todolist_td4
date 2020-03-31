@@ -36,7 +36,7 @@ import GroceryListTab from './GroceryListTab';
         computed: {
             all() {
                 if(! this.items) return []; 
-                return this.items;
+                return this.items.slice(0);
             },
             notDoneItems(){
                 if(! this.items) return []; 

@@ -1,13 +1,12 @@
 import Vue from 'nativescript-vue';
 import Vuex from 'vuex';
 
-Vue.use(Vuex);
+import axios from 'axios';
 
-import SQLite from 'nativescript-sqlite';
+Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        database: null,
         todoItems: [],
         auth: null,
     },
@@ -24,23 +23,22 @@ const store = new Vuex.Store({
         },
         authId(state) {
             if(!state.auth) return null;
-            return state.auth.uuid;
+            return state.auth.user.uuid;
         }
     },
     mutations: {
         init(state, data) {
-            state.database = data.database;
-            state.todoItems = data.todoItems
+            state.todoItems = data
         },
         insert(state, data) {
-            state.todoItems.unshift(data.todoItem);
+            state.todoItems.push(data);
         },
         update(state, data) {
-            const index = state.todoItems.findIndex((item) => item.id === data.todoItem.id);
-            state.todoItems.splice(index, 1, data.todoItem);
+            const index = state.todoItems.findIndex((item) => item.id === data.id);
+            state.todoItems.splice(index, 1, data);
         },
         delete(state, data) {
-            const index = state.todoItems.findIndex((item) => item.id === data.todoItem.id);
+            const index = state.todoItems.findIndex((item) => item.id === data.id);
             state.todoItems.splice(index, 1);
         },
         auth(state, data) {
@@ -49,71 +47,82 @@ const store = new Vuex.Store({
     },
     actions: {
         init(context) {
-            (new SQLite('todolist.db'))
-            .then((db) => {
-                //create db
-                db.execSQL("CREATE TABLE IF NOT EXISTS todoitems (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, done TEXT)")
-                .then(id => {
+            if(!context.getters.isAuth) return;
 
-                    //get data
-                    if(!db) return;
-                    db.all('SELECT * FROM todoitems ORDER BY id DESC', [])
-                    .then((result) => {
-                       const mapedItems = result.map((item) => {
-                           return {id: item[0], name: item[1], done: item[2] === 'true'}
-                       });
-                       context.commit('init', {database: db, todoItems: mapedItems});
-                    })
-                    .catch(() => {
-                        console.log('CANNOT INSERT TODO ELEMENT IN DB');
-                    });
-                })
-                .catch(() => {
-                    console.log('CANNOT CREATE TABLE');
-                })
+            axios.get(`https://api.todolist.sherpa.one/users/${context.getters.authId}/todos`, {
+                headers: {
+                    Authorization: `Bearer ${context.getters.authToken}`,
+                }
             })
-            .catch(() => {
-                console.log('CANNOT OPEN DATABASE');
-            });
+                .then((response) => {
+                    context.commit('init', response.data.todos.map((td) => ({
+                        id: td.uuid,
+                        name: td.content,
+                        done: td.done,
+                    }) ))
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
         },
         insert(context, item) {
-            const db = context.state.database;
-            db.execSQL("INSERT INTO todoitems(name, done) VALUES (?,?)", [item.name, 'false'])
-            .then((id) => {
-                const newItem = {
-                    id: id,
-                    name: item.name,
-                    done: false,
-                }
+            if(!context.getters.isAuth) return;
 
-                context.commit('insert', {todoItem: newItem});
+            axios.post(`https://api.todolist.sherpa.one/users/${context.getters.authId}/todos`, {content: item.name}, {
+                headers: {
+                    Authorization: `Bearer ${context.getters.authToken}`,
+                }
             })
-            .catch(() => {
-                console.log('CANNOT INSERT TODO ITEM IN DB', error);
-            });
+                .then((response) => {
+                    const newItem = {
+                        id: response.data.todo.uuid,
+                        name: response.data.todo.content,
+                        done: response.data.todo.done,
+                    }
+                    context.commit('insert', newItem)
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
         },
         update(context, item) {
-            const db = context.state.database;
-            if(item.id < 0) return;
-            db.execSQL("UPDATE todoitems SET name = ?, done = ? WHERE id = ? ", [item.name, item.done.toString(), item.id])
-            .then((id) => {
-                context.commit('update', {todoItem: item});
+            if(!context.getters.isAuth) return;
+
+            axios.patch(`https://api.todolist.sherpa.one/users/${context.getters.authId}/todos/${item.id}`, {content: item.name, done: item.done}, {
+                headers: {
+                    Authorization: `Bearer ${context.getters.authToken}`,
+                }
             })
-            .catch(() => {
-                console.log('CANNOT INSERT TODO ITEM IN DB', error);
-            })
+                .then((response) => {
+                    const newItem = {
+                        id: response.data.todo.uuid,
+                        name: response.data.todo.content,
+                        done: response.data.todo.done,
+                    }
+                    context.commit('update', newItem);
+                })
+                .catch((error) => {
+                    console.log(error.response);
+                })
         },
         delete(context, item) {
-            const db = context.state.database;
-            if(item.id < 0 || !item.done) return;
-            db.execSQL("DELETE FROM todoitems WHERE id = ?", [item.id])
-            .then((id) => {
-                if(!id) return;
-                context.commit('delete', {todoItem: item});
+            if(!context.getters.isAuth) return;
+
+            axios.delete(`https://api.todolist.sherpa.one/users/${context.getters.authId}/todos/${item.id}`, {
+                headers: {
+                    Authorization: `Bearer ${context.getters.authToken}`,
+                }
             })
+                .then(() => {
+                    context.commit('delete', item);
+                })
+                .catch((error) => {
+                    console.log(error.response);
+                })
         },
         auth(context, auth) {
             context.commit('auth', auth);
+            this.dispatch('init');
         }
     },
 });

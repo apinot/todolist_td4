@@ -35,6 +35,7 @@ export default {
     },
     computed: {
         items: function() {
+            console.log('33333333333333333333333333333333333333');
             return this.$store.getters.todoItems;
         }
     }

@@ -31,7 +31,7 @@ export default {
             firstName: '',
             lastName: '',
             selectedIndex: 0,
-            isLoading: true,
+            isLoading: false,
         };
     },
     computed: {
@@ -41,7 +41,7 @@ export default {
     },
     methods: {
         onSignup() {
-            if(isLoading) return;
+            if(this.isLoading) return;
             this.isLoading = true;
             const user = {
                 email: this.email,

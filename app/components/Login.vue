@@ -8,7 +8,10 @@
             <TextField v-model="email" hint="Email"/>
             <TextField v-model="password" hint="Password"/>
             <Label v-if="error" :text="error" color="red" horizontalAlignment="center"></Label>
-            <Button @tap="onLogin" marginTop="30">Login</Button>
+            <Button @tap="onLogin" marginTop="30">
+                Login
+            </Button>
+            <!-- <ActivityIndicator :busy="loading"/> -->
         </StackLayout>
     </Page>
 </template>
@@ -16,34 +19,34 @@
 <script>
 import axios from 'axios';
 import SignUp from './SignUp';
+import HomePage from './App';
 import {decode, encode} from "base-64";
 import btoa from 'btoa';
-import App from './App';
 
 export default {
     data() {
         return {
-            email: '',
-            password: '',
+            email: 'antoine.pinot1@etu.univ-lorraine.fr',
+            password: 'Ol1WGfSLnI',
             error: null,
+            loading: false,
         };
     },
     methods: {
         goSignup() {
             this.$navigateTo(SignUp);
         },
-        openDialog(data, onClosed = () => {}) {
-            alert({
-                title: data.title,
-                message: data.message,
-                okButtonText: data.okButtonText || 'OK',
-            }).then(() => {
-                onClosed();
-            });
+        goHome() {
+            this.$navigateTo(HomePage);
         },
         onLogin() {
+            console.log('tap');
+            if(this.loading) return;
+            this.loading = true;
             if(!global.btoa)
               global.btoa = encode;
+
+            console.log('tip');
 
 
             axios.post('https://api.todolist.sherpa.one/users/signin', {}, {
@@ -52,12 +55,19 @@ export default {
                 }
             })
             .then((response) => {
+                console.log('tep');
+                this.goHome();
                 this.$store.dispatch('auth', response.data);
-                this.$store.$navigateTo(App);
             })
             .catch((error) => {
+                console.log('tup');
+                console.log(error);
                 this.error = 'Email ou mot de passe incorrecte !'
-            });
+            })
+            .finally(() => {
+                this.loading = false;
+                console.log('top');
+            })
         }
     }
 }
