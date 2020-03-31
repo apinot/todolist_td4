@@ -40,13 +40,11 @@ export default {
             this.$navigateTo(HomePage);
         },
         onLogin() {
-            console.log('tap');
             if(this.loading) return;
             this.loading = true;
+
             if(!global.btoa)
               global.btoa = encode;
-
-            console.log('tip');
 
 
             axios.post('https://api.todolist.sherpa.one/users/signin', {}, {
@@ -55,18 +53,14 @@ export default {
                 }
             })
             .then((response) => {
-                console.log('tep');
-                this.goHome();
                 this.$store.dispatch('auth', response.data);
             })
             .catch((error) => {
-                console.log('tup');
                 console.log(error);
                 this.error = 'Email ou mot de passe incorrecte !'
             })
             .finally(() => {
                 this.loading = false;
-                console.log('top');
             })
         }
     }

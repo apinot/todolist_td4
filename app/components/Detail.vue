@@ -2,6 +2,7 @@
     <Page>
          <ActionBar title="Groceries">
             <ActionItem text="Edit" @tap="onEditTap"></ActionItem>   
+            <NavigationButton text="Go back" android.systemIcon="ic_menu_back" @tap="onBackTap"/>
         </ActionBar>
         <StackLayout>
             <Button text="Go back" @tap="onBackTap"></Button>

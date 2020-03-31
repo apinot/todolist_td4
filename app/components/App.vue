@@ -2,6 +2,7 @@
     <Page>
         <ActionBar title="Groceries">
             <ActionItem text="Add" @tap="onAddTap"></ActionItem>   
+            <ActionItem text="Sign out" @tap="signoutTap"></ActionItem>   
         </ActionBar>
         <StackLayout>
             <GroceryList :items="items"></GroceryList>
@@ -31,11 +32,22 @@ export default {
                     this.$store.dispatch('insert', newItem);
                 }
             });
+        },
+        signoutTap: function() {
+            confirm({
+                title: 'Sign out',
+                message: 'Do you really want to sign out ?',
+                okButtonText: 'Sign out',
+                cancelButtonText: 'Cancel'
+            })
+            .then((result) => {
+                if(!result) return;
+                this.$store.dispatch('auth', null);
+            })
         }
     },
     computed: {
         items: function() {
-            console.log('33333333333333333333333333333333333333');
             return this.$store.getters.todoItems;
         }
     }
