@@ -3,12 +3,14 @@ import Vuex from 'vuex';
 
 import axios from 'axios';
 
+import * as ApplicationSettings from "application-settings";
+
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
         todoItems: [],
-        auth: null,
+        auth: JSON.parse(ApplicationSettings.getString('auth', null)),
     },
     getters: {
         todoItems(state) {
@@ -122,6 +124,7 @@ const store = new Vuex.Store({
         },
         auth(context, auth) {
             context.commit('auth', auth);
+            ApplicationSettings.setString('auth', JSON.stringify(auth));
             this.dispatch('init');
         }
     },

@@ -26,8 +26,8 @@ import btoa from 'btoa';
 export default {
     data() {
         return {
-            email: 'antoine.pinot1@etu.univ-lorraine.fr',
-            password: 'Ol1WGfSLnI',
+            email: '',
+            password: '',
             error: null,
             loading: false,
         };
